@@ -9,6 +9,44 @@ function App() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  const openLink = (url) => window.open(url, '_blank')
+
+  // Utility: map Spline object names to actions
+  const makeSplineHandler = (map) => (e) => {
+    try {
+      const name = e?.target?.name || e?.target?.id || ''
+      // Debug: see what object was clicked
+      if (name) console.debug('[Spline click]', name)
+      const action = map[name]
+      if (!action) return
+      const [type, value] = action
+      switch (type) {
+        case 'scroll':
+          scrollToId(value)
+          break
+        case 'link':
+          openLink(value)
+          break
+        case 'toggleAbout':
+          setShowAboutMore((v) => !v)
+          break
+        case 'openProject':
+          setOpenProject((cur) => (cur === value ? null : value))
+          break
+        case 'skillTab':
+          setSkillTab(value)
+          break
+        case 'email':
+          window.open(`mailto:${value}`)
+          break
+        default:
+          break
+      }
+    } catch (err) {
+      console.warn('Spline handler error', err)
+    }
+  }
+
   // About state
   const [showAboutMore, setShowAboutMore] = useState(false)
 
@@ -47,11 +85,18 @@ function App() {
       <Navbar />
 
       <main className="relative">
+        {/* HOME */}
         <Section3D
           id="home"
           title="Welcome"
           subtitle="An immersive, 3D‑first portfolio experience"
           scene="https://prod.spline.design/VJLoxp84lCdVfdZu/scene.splinecode"
+          onMouseDown={makeSplineHandler({
+            ProjectsButton: ['scroll', 'projects'],
+            ContactButton: ['scroll', 'contact'],
+            AboutButton: ['scroll', 'about'],
+            AboutToggle: ['toggleAbout'],
+          })}
         >
           <div className="flex flex-wrap items-center gap-3">
             <button onClick={() => scrollToId('projects')} className="pointer-events-auto inline-flex items-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2 text-white font-medium shadow-lg shadow-blue-600/30 hover:brightness-110">
@@ -66,11 +111,16 @@ function App() {
           </div>
         </Section3D>
 
+        {/* ABOUT */}
         <Section3D
           id="about"
           title="About"
           subtitle="A quick snapshot of who I am and what I love to build"
           scene="https://prod.spline.design/VJLoxp84lCdVfdZu/scene.splinecode"
+          onMouseDown={makeSplineHandler({
+            ReadMore: ['toggleAbout'],
+            ViewSkills: ['scroll', 'skills'],
+          })}
         >
           <div className="space-y-3 max-w-2xl">
             <p className="text-blue-100/90">I craft delightful, performant interfaces and solid APIs. I enjoy 3D interactions, thoughtful motion, and clean code.</p>
@@ -90,11 +140,18 @@ function App() {
           </div>
         </Section3D>
 
+        {/* PROJECTS */}
         <Section3D
           id="projects"
           title="Projects"
           subtitle="Selected work told through playful 3D backdrops"
           scene="https://prod.spline.design/VJLoxp84lCdVfdZu/scene.splinecode"
+          onMouseDown={makeSplineHandler({
+            Card1: ['openProject', 'p1'],
+            Card2: ['openProject', 'p2'],
+            Card3: ['openProject', 'p3'],
+            CaseStudy: ['scroll', 'contact'],
+          })}
         >
           <div className="grid sm:grid-cols-3 gap-3">
             {[
@@ -124,11 +181,17 @@ function App() {
           </div>
         </Section3D>
 
+        {/* SKILLS */}
         <Section3D
           id="skills"
           title="Skills"
           subtitle="Tools, stacks, and specialties — visualized in 3D"
           scene="https://prod.spline.design/VJLoxp84lCdVfdZu/scene.splinecode"
+          onMouseDown={makeSplineHandler({
+            TabFrontend: ['skillTab', 'frontend'],
+            TabBackend: ['skillTab', 'backend'],
+            TabDevOps: ['skillTab', 'devops'],
+          })}
         >
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
@@ -140,7 +203,7 @@ function App() {
                 <button
                   key={t.id}
                   onClick={() => setSkillTab(t.id)}
-                  className={`rounded-lg px-3 py-1.5 text-sm border ${skillTab === t.id ? 'bg-gradient-to-r from-blue-600 to-cyan-500 border-transparent text-white' : 'bg-white/5 border-white/15 text-white hover:bg-white/10'}`}
+                  className={`rounded-lg px=3 py-1.5 text-sm border ${skillTab === t.id ? 'bg-gradient-to-r from-blue-600 to-cyan-500 border-transparent text-white' : 'bg-white/5 border-white/15 text-white hover:bg-white/10'}`}
                 >
                   {t.label}
                 </button>
@@ -178,11 +241,16 @@ function App() {
           </div>
         </Section3D>
 
+        {/* CONTACT */}
         <Section3D
           id="contact"
           title="Contact"
           subtitle="Say hello — the form lives in the panel on top of the scene"
           scene="https://prod.spline.design/VJLoxp84lCdVfdZu/scene.splinecode"
+          onMouseDown={makeSplineHandler({
+            EmailButton: ['email', 'you@email.com'],
+            LinkedInButton: ['link', 'https://www.linkedin.com'],
+          })}
         >
           <div className="grid lg:grid-cols-2 gap-5 max-w-3xl">
             <div>

@@ -1,13 +1,23 @@
 import Spline from '@splinetool/react-spline'
 
-export default function Section3D({ id, title, subtitle, scene, children }) {
+export default function Section3D({ id, title, subtitle, scene, children, onLoad, onMouseDown, onMouseUp, onKeyDown, onKeyUp }) {
   return (
     <section id={id} className="relative min-h-screen w-full overflow-hidden">
+      {/* 3D Scene */}
       <div className="absolute inset-0">
-        <Spline scene={scene} style={{ width: '100%', height: '100%' }} />
+        <Spline
+          scene={scene}
+          onLoad={onLoad}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
+          onKeyDown={onKeyDown}
+          onKeyUp={onKeyUp}
+          style={{ width: '100%', height: '100%' }}
+        />
       </div>
 
-      <div className="relative z-10 flex min-h-screen items-end sm:items-center justify-start">
+      {/* Overlay wrapper is pointer-events-none so the scene remains interactive except the panel */}
+      <div className="pointer-events-none relative z-10 flex min-h-screen items-end sm:items-center justify-start">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="pointer-events-auto inline-flex flex-col gap-4 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl px-5 py-5 shadow-2xl shadow-black/30">
             <div className="flex flex-col gap-2">
@@ -25,6 +35,7 @@ export default function Section3D({ id, title, subtitle, scene, children }) {
         </div>
       </div>
 
+      {/* Subtle vignette that doesn't block pointer events */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-950/10 via-transparent to-slate-950/40" />
     </section>
   )
